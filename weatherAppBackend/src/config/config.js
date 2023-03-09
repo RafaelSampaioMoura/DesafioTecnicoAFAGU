@@ -1,5 +1,4 @@
-// src/config/config.js
-import { config } from "dotenv";
+require('dotenv').config();
 
 const config = {
   username: process.env.USERNAME || "root",
