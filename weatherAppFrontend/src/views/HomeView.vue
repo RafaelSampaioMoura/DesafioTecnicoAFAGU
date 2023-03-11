@@ -68,9 +68,7 @@ const buscarLocalizações = async () => {
 }
 
 const paginaCidade = (cidade) => {
-  console.log(cidade)
   const { name, state, lat, lon } = cidade
-  console.log(name, state, lat, lon)
   router.push({
     name: 'cityView',
     params: { estado: state, cidade: name },

@@ -1,3 +1,95 @@
+<script setup>
+import axios from 'axios'
+import { ref, onBeforeMount } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+
+const addSymbol = ref('add_circle_outline')
+
+const router = useRouter()
+const route = useRoute()
+
+const {
+  params: { estado, cidade },
+  query: { lat, lon }
+} = route
+
+onBeforeMount(() => {
+  const favoritos = JSON.parse(localStorage.getItem('cidadesFavoritadas'))
+
+  if (favoritos
+      && favoritos.filter((e) => !(e.lat === lat && e.lon === lon)).length > 0) {
+    let query = Object.assign({}, route.query)
+    query.favorite = 'favorite'
+    router.replace({ query })
+  }
+})
+
+const pegarPrevisãoClima = async () => {
+  try {
+    const previsãoClima =
+      await axios.get(`https://api.openweathermap.org/data/2.5/forecast?lat=${route.query.lat}&lon=${route.query.lon}&appid=d0fdc863fa4a289abaa64a456bf44af9&lang=pt_br&units=metric
+`)
+
+    return previsãoClima
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const pegarDadosClima = async () => {
+  try {
+    const dadosClima = await axios.get(
+      `https://api.openweathermap.org/data/2.5/weather?lat=${route.query.lat}&lon=${route.query.lon}&appid=d0fdc863fa4a289abaa64a456bf44af9&lang=pt_br&units=metric`
+    )
+
+    return dadosClima
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const previsãoClima = await pegarPrevisãoClima()
+const dadosClima = await pegarDadosClima()
+
+const desfavoritarCidade = () => {
+  const favoritos = JSON.parse(localStorage.getItem('cidadesFavoritadas'))
+
+  const cidadeFoiFavoritada = favoritos.find(({ cords }) => cords.lat === lat && cords.lon === lon)
+
+  if (cidadeFoiFavoritada) {
+    const novoFavoritos = favoritos.filter(({ cords }) => !(cords.lat === lat && cords.lon === lon))
+
+    localStorage.setItem('cidadesFavoritadas', JSON.stringify(novoFavoritos))
+  }
+  let query = Object.assign({}, route.query)
+  delete query.favorite
+  router.replace({ query })
+}
+
+const favoritarCidade = () => {
+  if (!localStorage.getItem('cidadesFavoritadas')) {
+    localStorage.setItem(
+      'cidadesFavoritadas',
+      JSON.stringify([{ estado, cidade, cords: { lat, lon } }])
+    )
+    addSymbol.value = 'check'
+  } else {
+    const favoritos = JSON.parse(localStorage.getItem('cidadesFavoritadas'))
+
+    const dadosCidade = { estado, cidade, cords: { lat, lon } }
+
+    favoritos.push(dadosCidade)
+
+    localStorage.setItem('cidadesFavoritadas', JSON.stringify(favoritos))
+    addSymbol.value = 'check'
+  }
+
+  let query = Object.assign({}, route.query)
+  query.favorite = 'favorite'
+  router.replace({ query })
+}
+</script>
+
 <template>
   <div class="flex flex-1 flex-col items-center">
     <div class="p-4 w-full text-center">
@@ -6,7 +98,14 @@
     <i
       @click="favoritarCidade"
       class="material-icons hover:opacity-50 duration-200 hover:text-weather-text cursor-pointer"
-      >{{ addSymbol }}</i
+      v-if="!route.query.favorite"
+      >add_circle_outline</i
+    >
+    <i
+      @click="desfavoritarCidade"
+      class="material-icons hover:opacity-50 duration-200 hover:text-weather-text cursor-pointer"
+      v-if="route.query.favorite"
+      >check</i
     >
     <div class="flex flex-col items-center py-12 font-semibold">
       <h1 class="text-xl">{{ route.params.cidade }}, {{ route.params.estado }}</h1>
@@ -95,88 +194,5 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import axios from 'axios'
-import { ref } from 'vue';
-import { useRoute } from 'vue-router'
-
-const addSymbol = ref('add_circle_outline')
-
-const route = useRoute()
-const pegarPrevisãoClima = async () => {
-  try {
-    const previsãoClima =
-      await axios.get(`https://api.openweathermap.org/data/2.5/forecast?lat=${route.query.lat}&lon=${route.query.lon}&appid=d0fdc863fa4a289abaa64a456bf44af9&lang=pt_br&units=metric
-`)
-
-    return previsãoClima
-  } catch (error) {
-    console.log(error)
-  }
-}
-
-const pegarDadosClima = async () => {
-  try {
-    const dadosClima = await axios.get(
-      `https://api.openweathermap.org/data/2.5/weather?lat=${route.query.lat}&lon=${route.query.lon}&appid=d0fdc863fa4a289abaa64a456bf44af9&lang=pt_br&units=metric`
-    )
-
-    return dadosClima
-  } catch (error) {
-    console.log(error)
-  }
-}
-
-const previsãoClima = await pegarPrevisãoClima()
-const dadosClima = await pegarDadosClima()
-console.log(previsãoClima)
-console.log(dadosClima)
-
-const favoritarCidade = () => {
-  if (!localStorage.getItem('cidadesFavoritadas')) {
-    const { params: {estado, cidade}, query: lan, lon} = route
-    localStorage.setItem(
-      'cidadesFavoritadas',
-      JSON.stringify([
-        {
-          estado: estado,
-          cidade: cidade,
-          cords: {
-            lan: lan,
-            lon: lon
-          }
-        }
-      ])
-    )
-
-    addSymbol.value = 'check'
-  } else {
-    const cidadesFavoritadas = JSON.parse(localStorage.getItem('cidadesFavoritadas'))
-
-    const alreadySaved = cidadesFavoritadas.find(
-      (cidade) => cidade.estado === route.params.estado && cidade.cidade === route.params.cidade
-    )
-
-    if (alreadySaved) {
-      cidadesFavoritadas.filter(
-        (cidade) =>
-          !(cidade.estado === route.params.estado && cidade.cidade === route.params).cidade
-      )
-    } else {
-      cidadesFavoritadas.push({
-        estado: route.params.estado,
-        cidade: route.params.cidade,
-        cords: {
-          lan: route.query.lan,
-          lon: route.query.lon
-        }
-      })
-
-      localStorage.setItem('cidadesFavoritadas', cidadesFavoritadas)
-    }
-  }
-}
-</script>
 
 <style lang="scss" scoped></style>
