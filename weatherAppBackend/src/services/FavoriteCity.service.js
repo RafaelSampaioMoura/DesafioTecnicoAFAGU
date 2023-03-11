@@ -1,4 +1,4 @@
-import { CityModel } from "../models/favoriteCity.model";
+const { CityModel } = require("../models/favoriteCity.model");
 
 const getAll = async () => {
   const result = await CityModel.findAll();

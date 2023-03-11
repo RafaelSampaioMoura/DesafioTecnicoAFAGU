@@ -1,6 +1,3 @@
-const { DataTypes } = require("sequelize");
-const { sequelize } = require(".");
-
 const CityModel = (sequelize, DataTypes) => {
   const City = sequelize.define("City", {
     state: DataTypes.STRING,
@@ -9,8 +6,7 @@ const CityModel = (sequelize, DataTypes) => {
     lon: DataTypes.INTEGER,
   });
 
-
-  return City
+  return City;
 };
 
 module.exports = CityModel;

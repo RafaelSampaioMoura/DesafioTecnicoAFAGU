@@ -1,8 +1,8 @@
-import { getAll as _getAll, add as _add, erase as _erase } from "../services/FavoriteCity.service";
+const favCityService = require("../services/FavoriteCity.service");
 
 const getAll = async (_req, res) => {
   try {
-    const result = await _getAll();
+    const result = await favCityService.getAll();
 
     return res.status(200).json(result);
   } catch (error) {
@@ -13,7 +13,7 @@ const getAll = async (_req, res) => {
 const add = async (req, res) => {
   try {
     const { body } = req;
-    const result = await _add(body);
+    const result = await favCityService.add(body);
 
     res.status(201).json(result);
   } catch (error) {
@@ -24,7 +24,7 @@ const add = async (req, res) => {
 const erase = async (req, res) => {
   try {
     const { id } = req.body;
-    await _erase(id);
+    await favCityService.erase(id);
 
     return res.status(200).json({ message: "Cidade desfavoritada" });
   } catch (error) {
@@ -32,7 +32,7 @@ const erase = async (req, res) => {
   }
 };
 
-export default {
+module.exports = {
   getAll,
   add,
   erase,
