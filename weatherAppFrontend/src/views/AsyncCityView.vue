@@ -1,9 +1,13 @@
 <template>
   <div class="flex flex-1 flex-col items-center">
     <div class="p-4 w-full text-center">
-      Se você quiser acompanhar o clima dessa cidade, por favor clique no ícone "+" no canto
-      superior-direito da página
+      Se você quiser acompanhar o clima dessa cidade, por favor clique no ícone "+"
     </div>
+    <i
+      @click="favoritarCidade"
+      class="material-icons hover:opacity-50 duration-200 hover:text-weather-text cursor-pointer"
+      >{{ addSymbol }}</i
+    >
     <div class="flex flex-col items-center py-12 font-semibold">
       <h1 class="text-xl">{{ route.params.cidade }}, {{ route.params.estado }}</h1>
       <p>
@@ -67,7 +71,8 @@
                 class="h-24"
               />
               <p>
-                {{ Math.round(previsão.main.temp_min) }}° / {{ Math.round(previsão.main.temp_max) }}°
+                {{ Math.round(previsão.main.temp_min) }}° /
+                {{ Math.round(previsão.main.temp_max) }}°
               </p>
             </div>
           </div>
@@ -93,7 +98,10 @@
 
 <script setup>
 import axios from 'axios'
+import { ref } from 'vue';
 import { useRoute } from 'vue-router'
+
+const addSymbol = ref('add_circle_outline')
 
 const route = useRoute()
 const pegarPrevisãoClima = async () => {
@@ -124,6 +132,51 @@ const previsãoClima = await pegarPrevisãoClima()
 const dadosClima = await pegarDadosClima()
 console.log(previsãoClima)
 console.log(dadosClima)
+
+const favoritarCidade = () => {
+  if (!localStorage.getItem('cidadesFavoritadas')) {
+    const { params: {estado, cidade}, query: lan, lon} = route
+    localStorage.setItem(
+      'cidadesFavoritadas',
+      JSON.stringify([
+        {
+          estado: estado,
+          cidade: cidade,
+          cords: {
+            lan: lan,
+            lon: lon
+          }
+        }
+      ])
+    )
+
+    addSymbol.value = 'check'
+  } else {
+    const cidadesFavoritadas = JSON.parse(localStorage.getItem('cidadesFavoritadas'))
+
+    const alreadySaved = cidadesFavoritadas.find(
+      (cidade) => cidade.estado === route.params.estado && cidade.cidade === route.params.cidade
+    )
+
+    if (alreadySaved) {
+      cidadesFavoritadas.filter(
+        (cidade) =>
+          !(cidade.estado === route.params.estado && cidade.cidade === route.params).cidade
+      )
+    } else {
+      cidadesFavoritadas.push({
+        estado: route.params.estado,
+        cidade: route.params.cidade,
+        cords: {
+          lan: route.query.lan,
+          lon: route.query.lon
+        }
+      })
+
+      localStorage.setItem('cidadesFavoritadas', cidadesFavoritadas)
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped></style>

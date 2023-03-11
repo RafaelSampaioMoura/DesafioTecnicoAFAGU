@@ -41,6 +41,7 @@ import { ref } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 
+
 const router = useRouter()
 
 const errorBusca = ref(null)
@@ -75,7 +76,7 @@ const paginaCidade = (cidade) => {
     params: { estado: state, cidade: name },
     query: {
       lat: lat,
-      lon: lon,
+      lon: lon
     }
   })
 }

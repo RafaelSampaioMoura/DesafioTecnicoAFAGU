@@ -17,12 +17,7 @@
           @click="toggleInfoBox"
           >info</i
         >
-
-        <i
-          @click="favoritarCidade"
-          class="material-icons hover:opacity-50 duration-200 hover:text-weather-text cursor-pointer"
-          >{{ addSymbol }}</i
-        ><RouterLink :to="{ path: '/favoritos' }">
+        <RouterLink :to="{ path: '/favoritos' }">
           <i
             class="material-icons hover:opacity-50 duration-200 hover:text-weather-text cursor-pointer"
             >star</i
@@ -55,58 +50,13 @@
 
 <script setup>
 import { ref } from 'vue'
-import { RouterLink, useRoute } from 'vue-router'
+import { RouterLink } from 'vue-router'
 import BaseModal from './BaseModal.vue'
 
-const router = useRoute()
 
-const addSymbol = ref('add_circle_outline')
 const infoBoxActive = ref(null)
 const toggleInfoBox = () => {
   infoBoxActive.value = !infoBoxActive.value
 }
 
-const favoritarCidade = () => {
-  if (!localStorage.getItem('cidadesFavoritadas')) {
-    localStorage.setItem(
-      'cidadesFavoritadas',
-      JSON.stringify([
-        {
-          estado: router.params.estado,
-          cidade: router.params.cidade,
-          cords: {
-            lan: router.params.lan,
-            lon: router.params.lon
-          }
-        }
-      ])
-    )
-
-    addSymbol.value = 'info'
-  } else {
-    const cidadesFavoritadas = JSON.parse(localStorage.getItem('cidadesFavoritadas'))
-
-    const alreadySaved = cidadesFavoritadas.find(
-      (cidade) => cidade.estado === router.params.estado && cidade.cidade === router.params.cidade
-    )
-
-    if (alreadySaved) {
-      cidadesFavoritadas.filter(
-        (cidade) =>
-          !(cidade.estado === router.params.estado && cidade.cidade === router.params).cidade
-      )
-    } else {
-      cidadesFavoritadas.push({
-        estado: router.params.estado,
-        cidade: router.params.cidade,
-        cords: {
-          lan: router.params.lan,
-          lon: router.params.lon
-        }
-      })
-
-      localStorage.setItem('cidadesFavoritadas', cidadesFavoritadas)
-    }
-  }
-}
 </script>
