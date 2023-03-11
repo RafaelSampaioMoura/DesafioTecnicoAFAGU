@@ -17,10 +17,16 @@
           @click="toggleInfoBox"
           >info</i
         >
+
         <i
           @click="favoritarCidade"
           class="material-icons hover:opacity-50 duration-200 hover:text-weather-text cursor-pointer"
           >{{ addSymbol }}</i
+        ><RouterLink :to="{ path: '/favoritos' }">
+          <i
+            class="material-icons hover:opacity-50 duration-200 hover:text-weather-text cursor-pointer"
+            >star</i
+          ></RouterLink
         >
       </div>
 
@@ -74,9 +80,9 @@ const favoritarCidade = () => {
           }
         }
       ])
-    );
+    )
 
-    addSymbol.value = "info";
+    addSymbol.value = 'info'
   } else {
     const cidadesFavoritadas = JSON.parse(localStorage.getItem('cidadesFavoritadas'))
 
