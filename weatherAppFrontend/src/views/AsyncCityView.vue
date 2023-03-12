@@ -16,8 +16,8 @@ const {
 onBeforeMount(() => {
   const favoritos = JSON.parse(localStorage.getItem('cidadesFavoritadas'))
 
-  if (favoritos
-      && favoritos.filter((e) => !(e.lat === lat && e.lon === lon)).length > 0) {
+  if (favoritos && favoritos.find((e) => e.cords.lat === lat && e.cords.lon === lon)) {
+    console.log('aqui')
     let query = Object.assign({}, route.query)
     query.favorite = 'favorite'
     router.replace({ query })
