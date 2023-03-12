@@ -1,4 +1,4 @@
-const CityModel = (sequelize, DataTypes) => {
+module.exports = (sequelize, DataTypes) => {
   const City = sequelize.define("City", {
     state: DataTypes.STRING,
     city: DataTypes.STRING,
@@ -8,5 +8,3 @@ const CityModel = (sequelize, DataTypes) => {
 
   return City;
 };
-
-module.exports = CityModel;

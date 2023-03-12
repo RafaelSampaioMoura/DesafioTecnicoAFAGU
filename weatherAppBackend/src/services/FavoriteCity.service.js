@@ -1,20 +1,20 @@
-const { CityModel } = require("../models/favoriteCity.model");
+const { City } = require("../models");
 
 const getAll = async () => {
-  const result = await CityModel.findAll();
+  const result = await City.findAll();
 
   return result;
 };
 
 const add = async (cityInfo) => {
   const { state, city, lat, lon } = cityInfo;
-  const favCity = await CityModel.create({ state, city, lat, lon });
+  const favCity = await City.create({ state, city, lat, lon });
 
   return favCity;
 };
 
 const erase = async (id) => {
-  const delCity = await CityModel.destroy({
+  const delCity = await City.destroy({
     where: { id: id },
   });
 
