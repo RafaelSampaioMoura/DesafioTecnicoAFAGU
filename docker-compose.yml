@@ -1,0 +1,53 @@
+version: "3.9"
+services:
+  frontend:
+    build: 
+      context: ./weatherAppFrontend
+      dockerfile: Dockerfile
+    ports: 
+      - 8080:8080
+    platform: linux/x86_64
+    working_dir: /weatherAppFrontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "lsof", "-t", "-i:8080"]
+      timeout: 10s
+      retries: 5
+  backend:
+    build:
+      context: ./weatherAppBackend
+      dockerfile: Dockerfile
+    ports:
+      - 8081:8081
+    platform: linux/x86_64
+    working_dir: /weatherAppBackend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - APP_PORT=8081
+      - USERNAME=root
+      - PASSWORD=12345
+      - HOST=db
+      - PORT=3306
+    healthcheck:
+      test: ["CMD", "lsof", "-t", "-i:8081"]
+      timeout: 10s
+      retries: 5
+  db:
+    image: mysql:8.0.21
+    container_name: db
+    platform: linux/x86_64
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=12345
+    restart: 'always'
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 5
+    cap_add:
+      - SYS_NICE
